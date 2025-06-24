@@ -15,6 +15,6 @@ You control a green square to dodge falling red enemies.
 
 1. Compile :
 
-2.Run :
+2. Run :
 
 Enjoy the Game..!
