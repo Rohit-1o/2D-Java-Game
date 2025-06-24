@@ -1,0 +1,160 @@
+// Source code is decompiled from a .class file using FernFlower decompiler.
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.Timer;
+
+public class Game extends JPanel implements ActionListener, KeyListener, MouseListener {
+   Timer timer = new Timer(20, this);
+   int playerX = 250;
+   int playerY = 450;
+   int playerWidth = 50;
+   int playerHeight = 50;
+   ArrayList<Rectangle> enemies = new ArrayList();
+   int enemySpeed = 4;
+   boolean gameOver = false;
+   int score = 0;
+   Rectangle retryButton;
+
+   public Game() {
+      this.timer.start();
+      this.addKeyListener(this);
+      this.addMouseListener(this);
+      this.setFocusable(true);
+      this.spawnEnemy();
+   }
+
+   public void spawnEnemy() {
+      this.enemies.add(new Rectangle((int)(Math.random() * 500.0), 0, 50, 50));
+   }
+
+   public void resetGame() {
+      this.enemies.clear();
+      this.score = 0;
+      this.playerX = 250;
+      this.gameOver = false;
+      this.timer.start();
+      this.spawnEnemy();
+      this.repaint();
+   }
+
+   public void paintComponent(Graphics var1) {
+      super.paintComponent(var1);
+      var1.setColor(Color.BLACK);
+      var1.fillRect(0, 0, 600, 600);
+      var1.setColor(Color.WHITE);
+      var1.setFont(new Font("Arial", 0, 20));
+      var1.drawString("Score: " + this.score, 20, 30);
+      var1.setColor(Color.GREEN);
+      var1.fillRect(this.playerX, this.playerY, this.playerWidth, this.playerHeight);
+      var1.setColor(Color.RED);
+      Iterator var2 = this.enemies.iterator();
+
+      while(var2.hasNext()) {
+         Rectangle var3 = (Rectangle)var2.next();
+         var1.fillRect(var3.x, var3.y, var3.width, var3.height);
+      }
+
+      if (this.gameOver) {
+         var1.setColor(Color.WHITE);
+         var1.setFont(new Font("Arial", 1, 36));
+         var1.drawString("Game Over!", 200, 250);
+         var1.setFont(new Font("Arial", 1, 24));
+         var1.drawString("Final Score: " + this.score, 220, 300);
+         var1.setColor(Color.YELLOW);
+         this.retryButton = new Rectangle(225, 350, 150, 50);
+         var1.fillRect(this.retryButton.x, this.retryButton.y, this.retryButton.width, this.retryButton.height);
+         var1.setColor(Color.BLACK);
+         var1.setFont(new Font("Arial", 1, 20));
+         var1.drawString("RETRY", 265, 380);
+      }
+
+   }
+
+   public void actionPerformed(ActionEvent var1) {
+      if (!this.gameOver) {
+         Iterator var2 = this.enemies.iterator();
+
+         while(var2.hasNext()) {
+            Rectangle var3 = (Rectangle)var2.next();
+            var3.y += this.enemySpeed;
+            if (var3.y > 600) {
+               var3.y = 0;
+               var3.x = (int)(Math.random() * 500.0);
+               this.score += 10;
+            }
+
+            if (var3.intersects(new Rectangle(this.playerX, this.playerY, this.playerWidth, this.playerHeight))) {
+               this.gameOver = true;
+               this.timer.stop();
+            }
+         }
+
+         if (Math.random() < 0.02) {
+            this.spawnEnemy();
+         }
+
+         this.repaint();
+      }
+
+   }
+
+   public void keyPressed(KeyEvent var1) {
+      if (!this.gameOver) {
+         int var2 = var1.getKeyCode();
+         if (var2 == 37 && this.playerX > 0) {
+            this.playerX -= 10;
+         }
+
+         if (var2 == 39 && this.playerX < this.getWidth() - this.playerWidth) {
+            this.playerX += 10;
+         }
+      }
+
+   }
+
+   public void keyReleased(KeyEvent var1) {
+   }
+
+   public void keyTyped(KeyEvent var1) {
+   }
+
+   public void mouseClicked(MouseEvent var1) {
+      if (this.gameOver && this.retryButton != null && this.retryButton.contains(var1.getPoint())) {
+         this.resetGame();
+      }
+
+   }
+
+   public void mousePressed(MouseEvent var1) {
+   }
+
+   public void mouseReleased(MouseEvent var1) {
+   }
+
+   public void mouseEntered(MouseEvent var1) {
+   }
+
+   public void mouseExited(MouseEvent var1) {
+   }
+
+   public static void main(String[] var0) {
+      JFrame var1 = new JFrame("2D Dodge Game with Score & Retry");
+      Game var2 = new Game();
+      var1.add(var2);
+      var1.setSize(600, 600);
+      var1.setDefaultCloseOperation(3);
+      var1.setVisible(true);
+   }
+}
